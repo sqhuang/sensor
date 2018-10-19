@@ -31,10 +31,25 @@
 @property (strong, nonatomic) IBOutlet UILabel *lblLati;
 @property (strong, nonatomic) IBOutlet UILabel *lblHeight;
 
+//what we need
+
+@property double logLongti;
+@property double logLati;
+@property double logHeight;
+@property double logYaw;
+@property double logPitch;
+@property double logRoll;
+
+
 - (IBAction)motionSwitchHandler:(id)sender;
 
 @property (strong, nonatomic) CMMotionManager *motionManager;
 @property (nonatomic, strong) CLLocationManager *locationManager;
+
+
+//
+@property (strong, nonatomic) NSString *recordLogName;
+@property (strong, nonatomic) NSMutableArray< NSString*>* logNarratives;
 
 @end
 
@@ -72,10 +87,74 @@
     }else{
         NSLog(@"定位服务不可利用");
     }
+    
+    //Log
+    [self initRecordLogFileName];
 
     
     
 }
+
+- (void) initRecordLogFileName{
+    NSString *nowString = [VCCLogger nowString];
+    NSString *prefix = @"VideoLog";
+    NSString *postfix = @"txt";
+    NSString *filename = [NSString stringWithFormat:@"%@-%@.%@", prefix, nowString, postfix];
+    NSArray * paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString * documentDirectory = [paths objectAtIndex:0];
+    
+    self.recordLogName = [documentDirectory stringByAppendingPathComponent:filename];
+}
+
+-(void) logDroneStatuswhileShooting {
+
+    NSFileManager *manager = [NSFileManager defaultManager];
+    BOOL isExit = [manager fileExistsAtPath:self.recordLogName];
+    
+    if (!isExit) {
+        NSLog(@"文件不存在，创建中\n");
+        NSString *comment = [NSString stringWithFormat:@"%@\t%@\t%@\t%@\t%@\t%@\n", @"lon", @"lat", @"hei", @"Pitch", @"Yaw", @"Roll"];
+        if(![comment writeToFile:self.recordLogName atomically:YES encoding:NSUTF8StringEncoding error:nil])
+            NSLog(@"FAILED to create file!\n");
+        else{
+            NSLog(@"file name: %@\n", self.recordLogName);
+            NSLog(@"GUIDE: %@\n", comment);
+            [self.logNarratives addObject:comment];
+        }
+    }
+    
+    NSFileHandle *logHandle = [NSFileHandle fileHandleForWritingAtPath:self.recordLogName];
+    if (!logHandle) {
+        NSLog(@"文件打开失败！\n");
+    }
+    [logHandle seekToEndOfFile];
+    
+    CameraStatusPacket pack;
+    
+    pack.longitude = self.logLongti;
+    pack.latitude = self.logLati;
+    pack.height = self.logHeight;
+    
+    pack.cPitch = self.logPitch;
+    pack.cYaw = self.logYaw;
+    pack.cRoll = self.logRoll;
+
+    NSString *dataString = [NSString stringWithFormat: @"%10.7f\t%10.7f\t%10.3f\t%10.3f\t%10.3f\t%10.3f\n",  pack.longitude, pack.latitude, pack.height, pack.cYaw, pack.cPitch, pack.cRoll];
+    [self.logNarratives addObject:dataString];
+
+    NSString *text = self.logNarratives.firstObject;
+    text = [text stringByAppendingString:[self.logNarratives lastObject]];
+    
+    
+    NSData *buffer;
+    buffer = [dataString dataUsingEncoding:NSUTF8StringEncoding];
+    
+    [logHandle writeData:buffer];
+    [logHandle closeFile];
+    
+}
+
+
 
 - (void)initUI{
     
@@ -97,14 +176,25 @@
         self.lblGravityY.text = [NSString stringWithFormat:@"%.2f",motion.gravity.y];
         self.lblGravityZ.text = [NSString stringWithFormat:@"%.2f",motion.gravity.z];
         //yaw,pitch,roll
-        self.lblYaw.text = [NSString stringWithFormat:@"%.2f",motion.attitude.yaw];
-        self.lblPitch.text = [NSString stringWithFormat:@"%.2f",motion.attitude.pitch];
-        self.lblRoll.text = [NSString stringWithFormat:@"%.2f",motion.attitude.roll];
+//        self.logYaw = motion.attitude.yaw;
+//        self.logPitch = motion.attitude.pitch;
+//        self.logRoll = motion.attitude.roll;
+        
+        self.logYaw = motion.attitude.yaw;
+        self.logPitch = motion.attitude.roll;// human
+        self.logRoll = motion.attitude.pitch;// human
+        self.lblYaw.text = [NSString stringWithFormat:@"%.2f", (180/M_PI)*self.logYaw];
+        self.lblPitch.text = [NSString stringWithFormat:@"%.2f", (180/M_PI)*self.logPitch];
+        self.lblRoll.text = [NSString stringWithFormat:@"%.2f", (180/M_PI)*self.logRoll];
         //Gyroscope's rotationRate(CMRotationRate)
         self.lblRotationRateX.text = [NSString stringWithFormat:@"%.2f",motion.rotationRate.x];
         self.lblRotationRateY.text = [NSString stringWithFormat:@"%.2f",motion.rotationRate.y];
         self.lblRotationRateZ.text = [NSString stringWithFormat:@"%.2f",motion.rotationRate.z];
+        
+        [self logDroneStatuswhileShooting];
     }];
+    
+    
 }
 
 - (IBAction)motionSwitchHandler:(id)sender
@@ -112,8 +202,10 @@
     UISwitch *motionSwitch = (UISwitch *)sender;
     if(motionSwitch.on)
     {
-        [self controlHardware];
+        
         [self.locationManager startUpdatingLocation];
+        [self controlHardware];
+        
     }
     else
     {
@@ -127,8 +219,13 @@
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation{
-    self.lblLati.text = [NSString stringWithFormat:@"%3.8f",newLocation.coordinate.latitude];
-    self.lblLongti.text = [NSString stringWithFormat:@"%3.8f",newLocation.coordinate.longitude];
+    self.logLati = newLocation.coordinate.latitude;
+    self.lblLati.text = [NSString stringWithFormat:@"%3.8f",self.logLati];
+    self.logLongti = newLocation.coordinate.longitude;
+    self.lblLongti.text = [NSString stringWithFormat:@"%3.8f",self.logLongti];
+    self.logHeight = 1;
+    
+    
     
 }
 
@@ -136,9 +233,14 @@
     // 设备的当前位置
     CLLocation *currLocation = [locations firstObject];
     //获取经纬度
-    self.lblLati.text = [NSString stringWithFormat:@"%3.8f",currLocation.coordinate.latitude];
-    self.lblLongti.text = [NSString stringWithFormat:@"%3.8f",currLocation.coordinate.longitude];
-
+    
+    self.logLati = currLocation.coordinate.latitude;
+    self.lblLati.text = [NSString stringWithFormat:@"%3.8f",self.logLati];
+    self.logLongti = currLocation.coordinate.longitude;
+    self.lblLongti.text = [NSString stringWithFormat:@"%3.8f",self.logLongti];
+    self.logHeight = 1;
+    
+    
     
 }
 

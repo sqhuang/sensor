@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 #import <CoreMotion/CoreMotion.h>
+#import "VCCLogger.h"
+#include "VCCData.h"
 
 @interface ViewController : UIViewController
 
