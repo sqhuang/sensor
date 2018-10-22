@@ -44,7 +44,9 @@
 @property double logRoll;
 
 
-- (IBAction)motionSwitchHandler:(id)sender;
+//@property enum state{initmode, recordmode, debugmode } stateFlag;
+- (IBAction)recordSwitchHandler:(id)sender;
+- (IBAction)debugSwitchHandler:(id)sender;
 
 @property (strong, nonatomic) CMMotionManager *motionManager;
 @property (nonatomic, strong) CLLocationManager *locationManager;
@@ -93,6 +95,8 @@
     
     //Log
     [self initRecordLogFileName];
+    //
+    //_stateFlag = initmode;//switch
 
     
     
@@ -202,9 +206,10 @@
     
 }
 
-- (IBAction)motionSwitchHandler:(id)sender
+- (IBAction)recordSwitchHandler:(id)sender
 {
     UISwitch *motionSwitch = (UISwitch *)sender;
+    
     if(motionSwitch.on)
     {
         
@@ -215,10 +220,30 @@
     }
     else
     {
+         [_cameraVC videoStop];
         [self.motionManager stopDeviceMotionUpdates];
         [self.locationManager stopUpdatingLocation];
-        [_cameraVC videoStop];
     }
+}
+
+- (IBAction)debugSwitchHandler:(id)sender
+{
+    UISwitch *motionSwitch = (UISwitch *)sender;
+    if(motionSwitch.on)
+    {
+        
+        [self.locationManager startUpdatingLocation];
+        [self controlHardware];
+        //[_cameraVC videoStart];
+        
+    }
+    else
+    {
+        [self.motionManager stopDeviceMotionUpdates];
+        [self.locationManager stopUpdatingLocation];
+        //[_cameraVC videoStop];
+    }
+    
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
