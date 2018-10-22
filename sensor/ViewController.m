@@ -31,6 +31,9 @@
 @property (strong, nonatomic) IBOutlet UILabel *lblLati;
 @property (strong, nonatomic) IBOutlet UILabel *lblHeight;
 
+//video
+@property (strong, nonatomic)CameraViewController *cameraVC;
+
 //what we need
 
 @property double logLongti;
@@ -157,7 +160,9 @@
 
 
 - (void)initUI{
-    
+    self.cameraVC = [[CameraViewController alloc]init];
+    self.cameraVC.view.alpha = 0.5;
+    [self.view addSubview:self.cameraVC.view];
     
 }
 
