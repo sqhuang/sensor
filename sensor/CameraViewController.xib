@@ -11,7 +11,6 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CameraViewController">
             <connections>
-                <outlet property="videoBtn" destination="MdO-RE-IeF" id="P13-U1-bKj"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -19,27 +18,7 @@
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
             <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-            <subviews>
-                <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MdO-RE-IeF">
-                    <rect key="frame" x="214" y="421" width="80" height="30"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="30" id="AcF-Vk-vuq"/>
-                        <constraint firstAttribute="width" constant="46" id="L1H-6I-z4i"/>
-                    </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                    <state key="normal" title="Record">
-                        <color key="titleColor" red="0.20000000000000001" green="0.47058823529999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                    </state>
-                    <connections>
-                        <action selector="videoButtonAction:" destination="-1" eventType="touchUpInside" id="LII-h1-jVe"/>
-                    </connections>
-                </button>
-            </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-            <constraints>
-                <constraint firstAttribute="bottom" secondItem="MdO-RE-IeF" secondAttribute="bottom" constant="29" id="8ad-6w-Det"/>
-                <constraint firstAttribute="trailing" secondItem="MdO-RE-IeF" secondAttribute="trailing" constant="32" id="WWk-Hu-Li3"/>
-            </constraints>
             <point key="canvasLocation" x="63.75" y="67.5"/>
         </view>
     </objects>

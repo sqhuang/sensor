@@ -26,7 +26,7 @@
 @property (nonatomic, strong) AVCaptureMovieFileOutput *iMovieOutput;
 //预览层
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *iPreviewLayer;
-@property (weak, nonatomic) IBOutlet UIButton *videoBtn;
+
 
 @end
 
@@ -50,7 +50,7 @@
     [super viewDidLoad];
     
     //UI
-    [self.videoBtn setTitle:@"Record" forState:UIControlStateNormal];
+
     
     
     self.iSession = [[AVCaptureSession alloc]init];
@@ -121,12 +121,9 @@
 
 
 
-- (IBAction)videoButtonAction:(id)sender {
     
+- (void)videoStart{
     [self.iSession beginConfiguration];
-    if([self.videoBtn.titleLabel.text isEqualToString:@"Record"]){
-        
-        [self.videoBtn setTitle:@"Stop" forState:UIControlStateNormal];
         if ([self.iSession canAddOutput:self.iMovieOutput]) {
             [self.iSession addOutput:self.iMovieOutput];
         
@@ -141,20 +138,22 @@
         if (![self.iMovieOutput isRecording]) {
             [self.iMovieOutput startRecordingToOutputFileURL:url recordingDelegate:self];
         }
-        
-    } else if ([self.videoBtn.titleLabel.text isEqualToString:@"Stop"]){
-        [self.videoBtn setTitle:@"Start" forState:UIControlStateNormal];
+    
+}
+    
+    
+-(void)videoStop{
+
         if ([self.iMovieOutput isRecording]) {
             [self.iMovieOutput stopRecording];
         }
     
 //        [self.iSession beginConfiguration];
 //        [self.iSession commitConfiguration];
-        
+    }
     
     
-}
-}
+
 
 -(void)captureOutput:(AVCaptureFileOutput *)captureOutput didFinishRecordingToOutputFileAtURL:(NSURL *)outputFileURL fromConnections:(NSArray *)connections error:(NSError *)error{
     

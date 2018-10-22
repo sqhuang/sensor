@@ -11,4 +11,6 @@
 
 @interface CameraViewController : UIViewController
 
+- (void)videoStart;
+- (void)videoStop;
 @end

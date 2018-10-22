@@ -210,12 +210,14 @@
         
         [self.locationManager startUpdatingLocation];
         [self controlHardware];
+        [_cameraVC videoStart];
         
     }
     else
     {
         [self.motionManager stopDeviceMotionUpdates];
         [self.locationManager stopUpdatingLocation];
+        [_cameraVC videoStop];
     }
 }
 
