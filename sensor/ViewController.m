@@ -10,7 +10,7 @@
 
 #define IS_IOS8 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8)
 
-@interface ViewController ()
+@interface ViewController ()<IPConfigViewControllerDelegate>
 @property (strong, nonatomic) IBOutlet UILabel *lblYaw;
 @property (strong, nonatomic) IBOutlet UILabel *lblPitch;
 @property (strong, nonatomic) IBOutlet UILabel *lblRoll;
@@ -57,8 +57,11 @@
 - (IBAction)debugSwitchHandler:(id)sender;
 - (IBAction)newTakeAction:(id)sender;
 - (IBAction)IPConfigAction:(id)sender;
-- (IBAction)SendAction:(id)sender;
-- (IBAction)appInfoAction:(id)sender;
+- (IBAction)sendAction:(id)sender;
+- (IBAction)sandboxAction:(id)sender;
+
+
+@property (nonatomic, strong) IPConfigViewController *ipConfigVC;
 
 @property (strong, nonatomic) CMMotionManager *motionManager;
 @property (nonatomic, strong) CLLocationManager *locationManager;
@@ -176,9 +179,18 @@
 
 
 - (void)initUI{
+    //cameraVC
     self.cameraVC = [[CameraViewController alloc]init];
     self.cameraVC.view.alpha = 0.5;
     [self.view addSubview:self.cameraVC.view];
+    //ipConfigVC
+    self.ipConfigVC = [[IPConfigViewController alloc] initWithNibName:@"IPConfigViewController" bundle:[NSBundle mainBundle]];
+    self.ipConfigVC.view.alpha = 0;
+    self.ipConfigVC.view.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleBottomMargin;
+    [self.ipConfigVC.view setCenter:self.view.center];
+    self.ipConfigVC.delegate = self;
+    [self.view addSubview:self.ipConfigVC.view];
+    //appInfoVC
     
 }
 
@@ -287,20 +299,50 @@
 
 //
 - (IBAction)IPConfigAction:(id)sender{
-    NSLog(@"IPConfig to do");
+    WeakRef(weakSelf);
+    [UIView animateWithDuration:0.25 animations:^{
+        WeakReturn(weakSelf);
+        weakSelf.ipConfigVC.view.alpha = 1.0;
+    }];
 }
 
 //
-- (IBAction)SendAction:(id)sende{
+- (IBAction)sendAction:(id)sende{
     NSLog(@"Send to do");
 }
 
 // file info
-- (IBAction)appInfoAction:(id)sender{
-    NSLog(@"Appinfo to do");
+- (IBAction)sandboxAction:(id)sender{
+    NSLog(@"sandbox to do");
 }
 
 
+
+#pragma mark - ipConfigViewControllerDelegate Methods
+- (void)cancelBtnActionInIPConfigViewController:(IPConfigViewController *)ipConfigVC{
+    //
+    WeakRef(weakSelf);
+    [UIView animateWithDuration:0.25 animations:^{
+        WeakReturn(weakSelf);
+        weakSelf.ipConfigVC.view.alpha = 0.0;
+    }];
+}
+- (void)finishBtnActionInIPConfigViewController:(IPConfigViewController *)ipConfigVC{
+    NSLog(@"finishBtn to do");
+    //todo
+    WeakRef(weakSelf);
+    [UIView animateWithDuration:0.25 animations:^{
+        WeakReturn(weakSelf);
+        weakSelf.ipConfigVC.view.alpha = 0.0;
+    }];
+}
+
+
+
+
+
+
+//
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
     //NSLog(@"location %@",error);
 }

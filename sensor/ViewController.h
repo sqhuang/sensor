@@ -10,6 +10,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import <CoreMotion/CoreMotion.h>
 #import "CameraViewController.h"
+#import "IPConfigViewController.h"
 #import "VCCLogger.h"
 #include "VCCData.h"
 
