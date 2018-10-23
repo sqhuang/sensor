@@ -58,6 +58,7 @@
 - (IBAction)newTakeAction:(id)sender;
 - (IBAction)IPConfigAction:(id)sender;
 - (IBAction)SendAction:(id)sender;
+- (IBAction)appInfoAction:(id)sender;
 
 @property (strong, nonatomic) CMMotionManager *motionManager;
 @property (nonatomic, strong) CLLocationManager *locationManager;
@@ -279,14 +280,24 @@
     
 }
 
+//
 - (IBAction)newTakeAction:(id)sender{
     NSLog(@"newTake to do");
 }
+
+//
 - (IBAction)IPConfigAction:(id)sender{
     NSLog(@"IPConfig to do");
 }
+
+//
 - (IBAction)SendAction:(id)sende{
-     NSLog(@"Send to do");
+    NSLog(@"Send to do");
+}
+
+// file info
+- (IBAction)appInfoAction:(id)sender{
+    NSLog(@"Appinfo to do");
 }
 
 
