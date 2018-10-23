@@ -31,6 +31,11 @@
 @property (strong, nonatomic) IBOutlet UILabel *lblLati;
 @property (strong, nonatomic) IBOutlet UILabel *lblHeight;
 
+@property (strong, nonatomic) IBOutlet UILabel *lblcurTake;
+@property (strong, nonatomic) IBOutlet UILabel *lblStatus;
+
+
+
 //video
 @property (strong, nonatomic)CameraViewController *cameraVC;
 
@@ -43,11 +48,16 @@
 @property double logPitch;
 @property double logRoll;
 
-
+//
 //@property enum state{initmode, recordmode, debugmode } stateFlag;
+// UI on the right side
+
 - (IBAction)startSwitchHandler:(id)sender;
 - (IBAction)recordSwitchHandler:(id)sender;
 - (IBAction)debugSwitchHandler:(id)sender;
+- (IBAction)newTakeAction:(id)sender;
+- (IBAction)IPConfigAction:(id)sender;
+- (IBAction)SendAction:(id)sender;
 
 @property (strong, nonatomic) CMMotionManager *motionManager;
 @property (nonatomic, strong) CLLocationManager *locationManager;
@@ -268,6 +278,17 @@
     }
     
 }
+
+- (IBAction)newTakeAction:(id)sender{
+    NSLog(@"newTake to do");
+}
+- (IBAction)IPConfigAction:(id)sender{
+    NSLog(@"IPConfig to do");
+}
+- (IBAction)SendAction:(id)sende{
+     NSLog(@"Send to do");
+}
+
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
     //NSLog(@"location %@",error);
