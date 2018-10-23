@@ -45,6 +45,7 @@
 
 
 //@property enum state{initmode, recordmode, debugmode } stateFlag;
+- (IBAction)startSwitchHandler:(id)sender;
 - (IBAction)recordSwitchHandler:(id)sender;
 - (IBAction)debugSwitchHandler:(id)sender;
 
@@ -120,7 +121,7 @@
     
     if (!isExit) {
         NSLog(@"文件不存在，创建中\n");
-        NSString *comment = [NSString stringWithFormat:@"%@\t%@\t%@\t%@\t%@\t%@\n", @"lon", @"lat", @"hei", @"Pitch", @"Yaw", @"Roll"];
+        NSString *comment = [NSString stringWithFormat:@"#%@\t%@\t%@\t%@\t%@\t%@\n", @"lon", @"lat", @"hei", @"Yaw", @"Pitch", @"Roll"];
         if(![comment writeToFile:self.recordLogName atomically:YES encoding:NSUTF8StringEncoding error:nil])
             NSLog(@"FAILED to create file!\n");
         else{
@@ -206,6 +207,28 @@
     
 }
 
+#pragma mark - IBAcation
+// start localization warming up
+- (IBAction)startSwitchHandler:(id)sender
+{
+    UISwitch *motionSwitch = (UISwitch *)sender;
+    if(motionSwitch.on)
+    {
+        
+        [self.locationManager startUpdatingLocation];
+        //[self controlHardware];
+        //[_cameraVC videoStart];
+        
+    }
+    else
+    {
+        //[self.motionManager stopDeviceMotionUpdates];
+        [self.locationManager stopUpdatingLocation];
+        //[_cameraVC videoStop];
+    }
+    
+}
+// record and log
 - (IBAction)recordSwitchHandler:(id)sender
 {
     UISwitch *motionSwitch = (UISwitch *)sender;
@@ -213,7 +236,7 @@
     if(motionSwitch.on)
     {
         
-        [self.locationManager startUpdatingLocation];
+        //[self.locationManager startUpdatingLocation];
         [self controlHardware];
         [_cameraVC videoStart];
         
@@ -222,7 +245,7 @@
     {
          [_cameraVC videoStop];
         [self.motionManager stopDeviceMotionUpdates];
-        [self.locationManager stopUpdatingLocation];
+        //[self.locationManager stopUpdatingLocation];
     }
 }
 
@@ -232,7 +255,7 @@
     if(motionSwitch.on)
     {
         
-        [self.locationManager startUpdatingLocation];
+        //[self.locationManager startUpdatingLocation];
         [self controlHardware];
         //[_cameraVC videoStart];
         
@@ -240,7 +263,7 @@
     else
     {
         [self.motionManager stopDeviceMotionUpdates];
-        [self.locationManager stopUpdatingLocation];
+        //[self.locationManager stopUpdatingLocation];
         //[_cameraVC videoStop];
     }
     
