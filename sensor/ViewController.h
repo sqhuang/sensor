@@ -11,6 +11,8 @@
 #import <CoreMotion/CoreMotion.h>
 #import "CameraViewController.h"
 #import "IPConfigViewController.h"
+#import "SandboxViewController.h"
+
 #import "VCCLogger.h"
 #include "VCCData.h"
 

@@ -10,7 +10,7 @@
 
 #define IS_IOS8 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8)
 
-@interface ViewController ()<IPConfigViewControllerDelegate>
+@interface ViewController ()<IPConfigViewControllerDelegate, SandboxViewControllerDelegate>
 @property (strong, nonatomic) IBOutlet UILabel *lblYaw;
 @property (strong, nonatomic) IBOutlet UILabel *lblPitch;
 @property (strong, nonatomic) IBOutlet UILabel *lblRoll;
@@ -62,6 +62,7 @@
 
 
 @property (nonatomic, strong) IPConfigViewController *ipConfigVC;
+@property (nonatomic, strong) SandboxViewController *sbVC;
 
 @property (strong, nonatomic) CMMotionManager *motionManager;
 @property (nonatomic, strong) CLLocationManager *locationManager;
@@ -190,7 +191,13 @@
     [self.ipConfigVC.view setCenter:self.view.center];
     self.ipConfigVC.delegate = self;
     [self.view addSubview:self.ipConfigVC.view];
-    //appInfoVC
+    //sbVC
+    self.sbVC = [[SandboxViewController alloc] initWithNibName:@"SandboxViewController" bundle:[NSBundle mainBundle]];
+    self.sbVC.view.alpha = 0;
+    self.sbVC.view.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleBottomMargin;
+    [self.sbVC.view setCenter:self.view.center];
+    self.sbVC.delegate = self;
+    [self.view addSubview:self.sbVC.view];
     
 }
 
@@ -313,7 +320,12 @@
 
 // file info
 - (IBAction)sandboxAction:(id)sender{
-    NSLog(@"sandbox to do");
+    //NSLog(@"sandbox to do");
+    WeakRef(weakSelf);
+    [UIView animateWithDuration:0.25 animations:^{
+        WeakReturn(weakSelf);
+        weakSelf.sbVC.view.alpha = 1.0;
+    }];
 }
 
 
@@ -341,6 +353,16 @@
 
 
 
+#pragma mark - ipConfigViewControllerDelegate Methods
+- (void)doneBtnActionInSandboxViewController:(SandboxViewController *)sbConfigVC{
+NSLog(@"done btn in sandbox view to do");
+    WeakRef(weakSelf);
+    [UIView animateWithDuration:0.25 animations:^{
+        WeakReturn(weakSelf);
+        weakSelf.sbVC.view.alpha = 0.0;
+    }];
+    
+}
 
 //
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
