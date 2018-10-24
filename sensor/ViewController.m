@@ -10,7 +10,7 @@
 
 #define IS_IOS8 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8)
 
-@interface ViewController ()<IPConfigViewControllerDelegate, SandboxViewControllerDelegate>
+@interface ViewController ()<IPConfigViewControllerDelegate, SandboxViewControllerDelegate, GCDAsyncSocketDelegate>
 @property (strong, nonatomic) IBOutlet UILabel *lblYaw;
 @property (strong, nonatomic) IBOutlet UILabel *lblPitch;
 @property (strong, nonatomic) IBOutlet UILabel *lblRoll;
@@ -34,12 +34,12 @@
 @property (strong, nonatomic) IBOutlet UILabel *lblcurTake;
 @property (strong, nonatomic) IBOutlet UILabel *lblStatus;
 
-
+@property (strong, nonatomic) IBOutlet UIButton *btnSend;
 
 //video
 @property (strong, nonatomic)CameraViewController *cameraVC;
 
-//what we need
+//log data
 
 @property double logLongti;
 @property double logLati;
@@ -47,6 +47,13 @@
 @property double logYaw;
 @property double logPitch;
 @property double logRoll;
+
+//tcp
+@property (nonatomic, assign)BOOL isSending;
+@property (strong, nonatomic)NSTimer *timer;
+@property (strong, nonatomic)GCDAsyncSocket * clientSocket;
+
+
 
 //
 //@property enum state{initmode, recordmode, debugmode } stateFlag;
@@ -113,7 +120,8 @@
     [self initRecordLogFileName];
     //
     //_stateFlag = initmode;//switch
-
+    //send
+    self.isSending = 0;
     
     
 }
@@ -314,9 +322,47 @@
 }
 
 //
-- (IBAction)sendAction:(id)sende{
-    NSLog(@"Send to do");
+- (IBAction)sendAction:(id)sender{
+    //NSLog(@"Send to do");
+    if (!self.isSending) {
+        [self startSendPackage];
+        [self.btnSend setTitle:@"Stop" forState:UIControlStateNormal];
+    }else
+    {
+        [self.btnSend setTitle:@"Send" forState:UIControlStateNormal];
+        [self.timer invalidate];
+    }
+    
+    self.isSending = !self.isSending;
+    
+
 }
+
+- (void)startSendPackage{
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(sendPackageAction:) userInfo:nil repeats:YES];
+
+    [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
+}
+
+- (void)sendPackageAction:(NSTimer *)sender {
+    static int i = 0;
+    NSLog(@"NSTimer: %d",i);
+    i++;
+        CameraStatusPacket pack;
+    
+        pack.longitude = self.logLongti;
+        pack.latitude = self.logLati;
+        pack.height = self.logHeight;
+    
+        pack.cPitch = self.logPitch;
+        pack.cYaw = self.logYaw;
+        pack.cRoll = self.logRoll;
+        NSString *dataString = [NSString stringWithFormat: @"%10.7f\t%10.7f\t%10.3f\t%10.3f\t%10.3f\t%10.3f\n",  pack.longitude, pack.latitude, pack.height, pack.cYaw, pack.cPitch, pack.cRoll];
+        [self.logNarratives addObject:dataString];
+        [self.clientSocket writeData:[dataString dataUsingEncoding:NSUTF8StringEncoding] withTimeout:-1 tag:0];
+}
+
+
 
 // file info
 - (IBAction)sandboxAction:(id)sender{
@@ -342,6 +388,12 @@
 - (void)finishBtnActionInIPConfigViewController:(IPConfigViewController *)ipConfigVC{
     NSLog(@"finishBtn to do");
     //todo
+    //create socket
+    self.clientSocket = [[GCDAsyncSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    //connect socket
+    NSError * error = nil;
+    [self.clientSocket connectToHost:self.ipConfigVC.ipTextField.text onPort:[self.ipConfigVC.portTextField.text integerValue] error:&error];
+    
     WeakRef(weakSelf);
     [UIView animateWithDuration:0.25 animations:^{
         WeakReturn(weakSelf);
@@ -399,6 +451,27 @@ NSLog(@"done btn in sandbox view to do");
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+
+#pragma mark- GCDAsyncSocketDelegate
+- (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
+{
+    //创建的socket单例
+    VCCSocketManager * socketManager = [VCCSocketManager sharedSocketManager];
+    socketManager.vccSocket = sock;
+}
+
+- (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
+{
+    NSLog(@"connect lost");
+}
+
+- (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
+{
+    NSString * receiveddata = [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
+    
+    NSLog(@"messeage %@ recieved,",receiveddata);
 }
 
 

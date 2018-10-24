@@ -12,6 +12,7 @@
 #import "CameraViewController.h"
 #import "IPConfigViewController.h"
 #import "SandboxViewController.h"
+#import "VCCSocketManager.h"
 
 #import "VCCLogger.h"
 #include "VCCData.h"

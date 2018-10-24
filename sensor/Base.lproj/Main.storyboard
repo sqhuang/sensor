@@ -396,6 +396,7 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="btnSend" destination="4qc-1U-KnP" id="f0v-b9-hO8"/>
                         <outlet property="lblAccelerometerX" destination="qNo-Xe-JWw" id="dOR-YB-Gdb"/>
                         <outlet property="lblAccelerometerY" destination="qc6-ZW-ScL" id="uFw-iK-gzr"/>
                         <outlet property="lblAccelerometerZ" destination="9UD-AP-RcP" id="wPH-Tx-7rf"/>
