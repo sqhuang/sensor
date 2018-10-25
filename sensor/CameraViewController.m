@@ -224,6 +224,17 @@
         NSLog(@"zoom error\n");
     }
 }
+#pragma mark - focus 0 - 1
+- (void)cameraViewDidChangeFocus:(CGFloat)focus{
+    AVCaptureDevice *captureDevice = [self.iInput device];
+    NSError *error;
+    if ([captureDevice lockForConfiguration:&error]) {
+        if ([captureDevice isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) [captureDevice setFocusModeLockedWithLensPosition:focus completionHandler:nil];
+    }else{
+        // Handle the error appropriately.
+        NSLog(@"focus error\n");
+    }
+}
 
 - (CGFloat) getHFOV{
     return self.HFOV;

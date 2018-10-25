@@ -22,6 +22,7 @@
 
 //@property (weak, nonatomic) id <CameraViewControllerDelegate>delegate;
 - (void)cameraViewDidChangeZoom:(CGFloat)zoom;
+- (void)cameraViewDidChangeFocus:(CGFloat)focus;
 - (CGFloat) getHFOV;
 - (CGFloat) getVFOV;
 

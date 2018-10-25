@@ -68,7 +68,7 @@
 - (IBAction)sendAction:(id)sender;
 - (IBAction)sandboxAction:(id)sender;
 - (IBAction)zoomSliderChanged:(id)sender;
-
+- (IBAction)focusSliderChanged:(id)sender;
 
 @property (nonatomic, strong) IPConfigViewController *ipConfigVC;
 @property (nonatomic, strong) SandboxViewController *sbVC;
@@ -258,7 +258,6 @@
     UISwitch *motionSwitch = (UISwitch *)sender;
     if(motionSwitch.on)
     {
-        
         [self.locationManager startUpdatingLocation];
         //[self controlHardware];
         //[_cameraVC videoStart];
@@ -352,6 +351,12 @@
     [self.cameraVC cameraViewDidChangeZoom:zoomValue];
     
 }
+- (IBAction)focusSliderChanged:(id)sender{
+    UISlider *slider = (UISlider *)sender;
+    CGFloat focusValue =slider.value;
+    [self.cameraVC cameraViewDidChangeFocus:focusValue];
+}
+
 
 - (void)startSendPackage{
     // #init data
