@@ -8,9 +8,22 @@
 
 #import <UIKit/UIKit.h>
 //#import <AVFoundation/AVFoundation.h>
+//@protocol CameraViewControllerDelegate <NSObject>
+//
+//- (void)cameraViewDidChangeZoom:(CGFloat)zoom;
+//
+//@end
+
 
 @interface CameraViewController : UIViewController
 
 - (void)videoStart;
 - (void)videoStop;
+
+//@property (weak, nonatomic) id <CameraViewControllerDelegate>delegate;
+- (void)cameraViewDidChangeZoom:(CGFloat)zoom;
+- (CGFloat) getHFOV;
+- (CGFloat) getVFOV;
+
+
 @end

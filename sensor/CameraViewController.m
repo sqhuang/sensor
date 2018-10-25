@@ -28,9 +28,21 @@
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *iPreviewLayer;
 
 
+@property (nonatomic, assign) CGFloat HFOV;
+@property (nonatomic, assign) CGFloat VFOV;
+@property (nonatomic, assign) CGFloat cx;
+@property (nonatomic, assign) CGFloat cy;
+@property (nonatomic, assign) CGFloat fx;
+@property (nonatomic, assign) CGFloat fy;
+
+
+
+
 @end
 
 @implementation CameraViewController
+
+
 
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
@@ -112,7 +124,29 @@
     
     [self.iSession startRunning];
     
+    [self showIntrinsicMatrix];
+    
 }
+
+// show intrinsic Matrix
+- (void)showIntrinsicMatrix{
+    AVCaptureDeviceFormat *format = self.iInput.device.activeFormat;
+    CMFormatDescriptionRef fDesc = format.formatDescription;
+    CGSize dim = CMVideoFormatDescriptionGetPresentationDimensions(fDesc, true, true);
+    
+    _cx = (float)(dim.width) / 2.0;
+    _cy = (float)(dim.height) / 2.0;
+    
+    self.HFOV = format.videoFieldOfView;
+    self.VFOV = ((self.HFOV)/_cx)*_cy;
+    
+    _fx = fabs((float)(dim.width) / (2 * tan(self.HFOV / 180 * (float)(M_PI) / 2)));
+    _fy = fabs((float)(dim.height) / (2 * tan(self.VFOV  / 180 * (float)(M_PI) / 2)));
+    
+    NSLog(@"ipad mini 4 intrinsic Matrix\n");
+    NSLog(@"cx:\t%f\ncy:\t%f\nfx:\t%f\nfy:\t%f\nHFOV:\t%f\nVFOV:\t%f\n", _cx,_cy,_fx,_fy,self.HFOV,self.VFOV );
+}
+
 
 #pragma mark - ButtonAction
 
@@ -177,5 +211,26 @@
     // Pass the selected object to the new view controller.
 }
 */
+
+#pragma mark - zoom 1 - 3
+- (void)cameraViewDidChangeZoom:(CGFloat)zoom {
+    AVCaptureDevice *captureDevice = [self.iInput device];
+    NSError *error;
+    if ([captureDevice lockForConfiguration:&error]) {
+        [captureDevice rampToVideoZoomFactor:zoom withRate:50];
+        [self showIntrinsicMatrix];
+    }else{
+        // Handle the error appropriately.
+        NSLog(@"zoom error\n");
+    }
+}
+
+- (CGFloat) getHFOV{
+    return self.HFOV;
+}
+
+- (CGFloat) getVFOV{
+    return self.VFOV;
+}
 
 @end

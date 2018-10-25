@@ -27,6 +27,9 @@ typedef struct {
     double cPitch;
     double cYaw;
     double cRoll;
+    
+    double hFov;
+    double vFov;
 }CameraStatusPacket;
 
 #endif /* VCCData_h */

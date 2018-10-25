@@ -35,6 +35,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *lblStatus;
 
 @property (strong, nonatomic) IBOutlet UIButton *btnSend;
+@property (strong, nonatomic) IBOutlet UISlider *zoomSilder;
 
 //video
 @property (strong, nonatomic)CameraViewController *cameraVC;
@@ -66,6 +67,7 @@
 - (IBAction)IPConfigAction:(id)sender;
 - (IBAction)sendAction:(id)sender;
 - (IBAction)sandboxAction:(id)sender;
+- (IBAction)zoomSliderChanged:(id)sender;
 
 
 @property (nonatomic, strong) IPConfigViewController *ipConfigVC;
@@ -123,6 +125,9 @@
     //send
     self.isSending = 0;
     
+    // camera interal parameters
+
+    
     
 }
 
@@ -144,7 +149,7 @@
     
     if (!isExit) {
         NSLog(@"文件不存在，创建中\n");
-        NSString *comment = [NSString stringWithFormat:@"#%@\t%@\t%@\t%@\t%@\t%@\n", @"lon", @"lat", @"hei", @"Yaw", @"Pitch", @"Roll"];
+        NSString *comment = [NSString stringWithFormat:@"#%@\t%@\t%@\t%@\t%@\t%@\t%@\t%@\n", @"lon", @"lat", @"hei", @"Yaw", @"Pitch", @"Roll", @"HFOV", @"VFOV"];
         if(![comment writeToFile:self.recordLogName atomically:YES encoding:NSUTF8StringEncoding error:nil])
             NSLog(@"FAILED to create file!\n");
         else{
@@ -170,7 +175,7 @@
     pack.cYaw = self.logYaw;
     pack.cRoll = self.logRoll;
 
-    NSString *dataString = [NSString stringWithFormat: @"%10.7f\t%10.7f\t%10.3f\t%10.3f\t%10.3f\t%10.3f\n",  pack.longitude, pack.latitude, pack.height, pack.cYaw, pack.cPitch, pack.cRoll];
+   NSString *dataString = [NSString stringWithFormat: @"%10.7f\t%10.7f\t%10.3f\t%10.3f\t%10.3f\t%10.3f\t%10.3f\t%10.3f\n",  pack.longitude, pack.latitude, pack.height, pack.cYaw, pack.cPitch, pack.cRoll, pack.hFov, pack.vFov];
     [self.logNarratives addObject:dataString];
 
     NSString *text = self.logNarratives.firstObject;
@@ -191,6 +196,7 @@
     //cameraVC
     self.cameraVC = [[CameraViewController alloc]init];
     self.cameraVC.view.alpha = 0.5;
+    //self.cameraVC.delegate = self;
     [self.view addSubview:self.cameraVC.view];
     //ipConfigVC
     self.ipConfigVC = [[IPConfigViewController alloc] initWithNibName:@"IPConfigViewController" bundle:[NSBundle mainBundle]];
@@ -338,7 +344,20 @@
 
 }
 
+- (IBAction)zoomSliderChanged:(id)sender{
+    
+    UISlider *slider = (UISlider *)sender;
+    CGFloat zoomValue =slider.value;
+    //NSLog(@"%f", zoomValue);
+    [self.cameraVC cameraViewDidChangeZoom:zoomValue];
+    
+}
+
 - (void)startSendPackage{
+    // #init data
+    NSString *dataheader = [NSString stringWithFormat: @"# I am a phone"];
+    [self.clientSocket writeData:[dataheader dataUsingEncoding:NSUTF8StringEncoding] withTimeout:-1 tag:0];
+    // send per second
     self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(sendPackageAction:) userInfo:nil repeats:YES];
 
     [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
@@ -348,18 +367,21 @@
     static int i = 0;
     NSLog(@"NSTimer: %d",i);
     i++;
-        CameraStatusPacket pack;
-    
-        pack.longitude = self.logLongti;
-        pack.latitude = self.logLati;
-        pack.height = self.logHeight;
-    
-        pack.cPitch = self.logPitch;
-        pack.cYaw = self.logYaw;
-        pack.cRoll = self.logRoll;
-        NSString *dataString = [NSString stringWithFormat: @"%10.7f\t%10.7f\t%10.3f\t%10.3f\t%10.3f\t%10.3f\n",  pack.longitude, pack.latitude, pack.height, pack.cYaw, pack.cPitch, pack.cRoll];
-        [self.logNarratives addObject:dataString];
-        [self.clientSocket writeData:[dataString dataUsingEncoding:NSUTF8StringEncoding] withTimeout:-1 tag:0];
+    CameraStatusPacket pack;
+
+    pack.longitude = self.logLongti;
+    pack.latitude = self.logLati;
+    pack.height = self.logHeight;
+
+    pack.cPitch = self.logPitch;
+    pack.cYaw = self.logYaw;
+    pack.cRoll = self.logRoll;
+//
+    pack.hFov = [self.cameraVC getHFOV];
+    pack.vFov = [self.cameraVC getVFOV];
+    NSString *dataString = [NSString stringWithFormat: @"%10.7f\t%10.7f\t%10.3f\t%10.3f\t%10.3f\t%10.3f\t%10.3f\t%10.3f\n",  pack.longitude, pack.latitude, pack.height, pack.cYaw, pack.cPitch, pack.cRoll, pack.hFov, pack.vFov];
+    //[self.logNarratives addObject:dataString];
+    [self.clientSocket writeData:[dataString dataUsingEncoding:NSUTF8StringEncoding] withTimeout:-1 tag:0];
 }
 
 
