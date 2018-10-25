@@ -10,4 +10,7 @@
 
 * UI
 
-![image](https://github.com/sqhuang/.../blob/master/.../img/index_page.png)
+![image](https://github.com/sqhuang/sensor/blob/master/sensor/img/1.png)
+![image](https://github.com/sqhuang/sensor/blob/master/sensor/img/2.png)
+
+
