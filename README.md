@@ -4,7 +4,7 @@
 * Simple demo for recording sensor information(currently just gps and camera's Euler Angle) locally or sending it to somewhere eles by tcp while shooting videos.
 
 ## for the new drone project
-* hope all is well
+* no more new drone project
 
 ## prototype
 
